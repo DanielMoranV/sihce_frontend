@@ -38,7 +38,11 @@ const onSubmit = async () => {
     }
   } catch (err) {
     // Este bloque solo se activa si `login()` lanza un error
-    toast.error("Error al iniciar sesión");
+    toast.error("Error de conexión", {
+      description: "Verifica tu conexión a internet",
+      duration: 3000,
+      position: "top-right",
+    });
   }
 
   // Mostrar errores de validación si existen
@@ -54,6 +58,7 @@ const onSubmit = async () => {
     toast.error("Errores de validación", {
       description: descriptions.join("\n"),
       duration: 4000,
+      position: "top-right",
     });
   }
 };

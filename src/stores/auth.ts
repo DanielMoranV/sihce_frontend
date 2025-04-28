@@ -12,7 +12,9 @@ export const useAuthStore = defineStore("auth", {
   state: () => ({
     token: null as string | null,
     refresh: null as string | null,
-    user: null as User | null,
+    user: localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user")!)
+      : null,
     isLoading: false,
     error: null as LoginErrorResponse["errors"] | null,
     status: null as string | null,
@@ -35,10 +37,10 @@ export const useAuthStore = defineStore("auth", {
           this.setRefresh(responseAuth.data.refresh);
         }
       } catch (error: any) {
-        console.log(error);
         this.setError(error.data.errors);
+      } finally {
+        this.isLoading = false;
       }
-      this.isLoading = false;
     },
     setToken(token: TokenResponse) {
       this.token = token.access;
@@ -54,9 +56,16 @@ export const useAuthStore = defineStore("auth", {
     clearToken() {
       this.token = null;
       localStorage.removeItem("token");
+      localStorage.removeItem("refresh");
+      localStorage.removeItem("user");
+      this.user = null;
+      this.refresh = null;
+      this.error = null;
+      this.status = null;
     },
     setUser(user: User | null) {
       this.user = user;
+      localStorage.setItem("user", JSON.stringify(user));
     },
     logout() {
       this.clearToken();
