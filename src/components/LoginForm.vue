@@ -33,8 +33,14 @@ const onSubmit = async () => {
     await authStore.login({ dni: dni.value, password: password.value });
 
     if (authStore.token) {
-      toast.success("Sesión iniciada con éxito");
-      router.push("/dashboard");
+      // usar un timer para mostrar el toast
+      toast.success("Sesión iniciada con éxito", {
+        duration: 3000,
+        position: "top-right",
+      });
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 4000);
     }
   } catch (err) {
     // Este bloque solo se activa si `login()` lanza un error
@@ -47,19 +53,37 @@ const onSubmit = async () => {
 
   // Mostrar errores de validación si existen
   if (authStore.error) {
+    const error = authStore.error;
+
+    // Mostrar error general si existe
+    const nonFieldError = error?.non_field_errors?.[0];
+    if (nonFieldError) {
+      toast.error("Error de validación", {
+        description: nonFieldError,
+        duration: 4000,
+        position: "top-right",
+      });
+      return;
+    }
+
+    // Recolectar y mostrar errores por campo
     const descriptions: string[] = [];
 
-    Object.entries(authStore.error).forEach(([field, messages]) => {
-      messages.forEach((msg: string) => {
-        descriptions.push(`${field.toUpperCase()}: ${msg}`);
-      });
+    Object.entries(error).forEach(([field, messages]) => {
+      if (Array.isArray(messages)) {
+        messages.forEach((msg: string) => {
+          descriptions.push(`${field.toUpperCase()}: ${msg}`);
+        });
+      }
     });
 
-    toast.error("Errores de validación", {
-      description: descriptions.join("\n"),
-      duration: 4000,
-      position: "top-right",
-    });
+    if (descriptions.length > 0) {
+      toast.error("Errores de validación", {
+        description: descriptions.join("\n"),
+        duration: 4000,
+        position: "top-right",
+      });
+    }
   }
 };
 </script>

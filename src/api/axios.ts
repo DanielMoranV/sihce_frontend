@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/auth";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL, // Asegúrate de tener esta variable en .env
   timeout: 20000,
+  withCredentials: true,
 });
 
 api.interceptors.request.use(
